@@ -43,15 +43,9 @@ Route::get('/logout', function () {
 }); 
 
 Route::get('/validation','ValidationController@showform');
-//Route::get('/validation', [ValidationController::class, 'showform']);
 Route::post('/validation','ValidationController@validateform');
-//Route::post('/validation', [ValidationController::class, 'storvalidateforme']);
-
 Route::get('form', [FormController::class, 'create'])->name('form.create');
-//Route::get('form', 'App\Http\Controllers\FormController@create')->name('form.create');
-
 Route::post('store-form', [FormController::class, 'store'])->name('form.store');
-//Route::post('form', 'FormController@store')->name('form.store');
 
 Route::get('relation',[UserController::class,'test_relation_one']);
 
