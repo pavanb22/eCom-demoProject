@@ -7,6 +7,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ValidationController;
 use App\Http\Controllers\FormController;
+use App\Mail\SampleMail;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -51,3 +52,11 @@ Route::get('relation',[UserController::class,'test_relation_one']);
 
 Route::get('/add-product',[ProductController::class,'product']);
 Route::post('/add-product',[ProductController::class,'add_product']);
+
+//route model binding
+Route::get('bind/{key:name}',[UserController::class,'route_bind']);
+
+//Markdown mail template
+Route::get('/mail', function () {
+  return new SampleMail();
+}); 

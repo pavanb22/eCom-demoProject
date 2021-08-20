@@ -42,4 +42,9 @@ class UserController extends Controller
        // return Order::find(1)->orderData;
        return User::find(1)->orderData;
     }
+
+    public function route_bind(User $key)
+    {
+        return $key;
+    }
 }
