@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Cart;
 use App\Models\Order;
 use Session;
+use Validator;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
@@ -50,8 +51,103 @@ class ProductController extends Controller
             $product->save();
             return redirect('/add-product');
         }
+    }
 
+    public function show_list($id=null)
+    {
+        return $id?Product::find($id):Product::all();
+    }
 
+    public function add(Request $request)
+    {
+        $product = new Product;
+        $product->name = $request->name;
+        $product->price = $request->price;
+        $product->category = $request->category;
+        $product->gallery = $request->gallery;
+        $product->description = $request->description;
+        $result = $product->save();
+        if($result)
+        {
+            return ['result' => 'Data has been saved'];
+        }
+        else{
+            return ['result' => 'Data not saved'];
+        }
+        
+    }
+
+    public function update(Request $request){
+        $product = Product::find($request->id);
+        $product->name = $request->name;
+        $product->price = $request->price;
+        $product->category = $request->category;
+        $product->gallery = $request->gallery;
+        $product->description = $request->description;
+        $result = $product->save();
+
+        if($result)
+        {
+            return ['result' => 'Data has been updated'];
+        }
+        else{
+            return ['result' => 'Data not updated'];
+        }
+
+    }
+
+    public function delete($id){
+        $product = Product::find($id);
+        $result = $product->delete();
+        
+        if($result)
+        {
+            return ['result' => 'Data deleted'];
+        }
+        else{
+            return ['result' => 'Data not deleted'];
+        }
+    }
+
+    public function search($name)
+    {
+        $result = Product::where("name","like","%".$name."%")->get();
+        if(count($result)>0)
+        {
+            return $result;
+        }
+        else{
+            return ['result' => 'Data not found'];
+        }
+    }
+
+    public function test_data(Request $request)
+    {
+        $rules = array(
+            'name' => "required"
+        );
+
+        $validator = Validator::make($request->all(),$rules);
+        if($validator->fails())
+        {
+            return response()->json($validator->errors(),401);
+        }
+        else{
+            $product = new Product;
+            $product->name = $request->name;
+            $product->price = $request->price;
+            $product->category = $request->category;
+            $product->gallery = $request->gallery;
+            $product->description = $request->description;
+            $result = $product->save();
+            if($result)
+            {
+                return ['result' => 'Data has been saved'];
+            }
+            else{
+                return ['result' => 'Data not saved'];
+            }
+        }
     }
 
     /*public function add_cart(Request $request)

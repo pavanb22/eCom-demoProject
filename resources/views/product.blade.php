@@ -10,7 +10,7 @@
                         @foreach ($products as $item)
                         <div class="col-lg-2 mb-3">
                             <div class="card shadow mb-4">
-                                <img class="card-img-top" src="'http://127.0.0.1:8000/storage/.$item['gallery']'." alt="Card image" height="250" >
+                                <img class="card-img-top" src="{{ $item['gallery'] }}" alt="Card image" height="250" >
                                 <div class="bg-primary"><h5 class="m-2 text-white">{{$item['name']}}</h5></div>
                                 <div class="card-body text-dark">
                                     <h6 class="text-center"><strong>&#8377; </strong><strong>{{$item['price']}}</strong></h6>
