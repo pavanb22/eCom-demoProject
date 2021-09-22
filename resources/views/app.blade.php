@@ -1,11 +1,15 @@
 <?php
     use App\Http\Controllers\CartController;
+    use App\Models\User;
+    use Carbon\Carbon;
 
     $total = 0;
 
     if (Session::has('user'))
     {
         $total = CartController::cart_item();
+        $user = User::find(Session::get('user')['id']);
+        $count = 1;
     }
 
 ?>
@@ -62,7 +66,7 @@
 
             <!-- Divider -->
             <hr class="sidebar-divider">
-
+            @if (Session::has('user'))
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
                 <a class="nav-link" href="/myorder">
@@ -72,7 +76,7 @@
 
             <!-- Divider -->
             <hr class="sidebar-divider">
-
+            @endif
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
@@ -137,55 +141,63 @@
                         </li>
 
                         <!-- Nav Item - Alerts -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-bell fa-fw"></i>
-                                <!-- Counter - Alerts -->
-                                <span class="badge badge-danger badge-counter">3+</span>
-                            </a>
-                            <!-- Dropdown - Alerts -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="alertsDropdown">
-                                <h6 class="dropdown-header">
-                                    Alerts Center
-                                </h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-primary">
-                                            <i class="fas fa-file-alt text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 12, 2019</div>
-                                        <span class="font-weight-bold">A new monthly report is ready to download!</span>
-                                    </div>
+                        @if (Session::has('user'))
+                            <li class="nav-item dropdown no-arrow mx-1">
+                                <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-bell fa-fw"></i>
+                                    <!-- Counter - Alerts -->
+                                    @if ($user->unreadNotifications->count())
+                                        <span class="badge badge-danger badge-counter">{{$user->unreadNotifications->count()}}</span>
+                                    @endif
                                 </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-success">
-                                            <i class="fas fa-donate text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 7, 2019</div>
-                                        $290.29 has been deposited into your account!
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-warning">
-                                            <i class="fas fa-exclamation-triangle text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 2, 2019</div>
-                                        Spending Alert: We've noticed unusually high spending for your account.
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
-                            </div>
-                        </li>
+                                <!-- Dropdown - Alerts -->
+                                <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                    aria-labelledby="alertsDropdown">
+                                    <h6 class="dropdown-header">
+                                       Notifications
+                                    </h6>
+                                    @if ($user->unreadNotifications->count())
+                                    <a class="dropdown-item d-flex align-items-center" href="/mark-read">
+                                        <span class="font-weight-bold text-danger">Mark all as Read</span>
+                                    </a>
+                                    @endif
+                                    @foreach ($user->unreadNotifications as $notification)
+                                        @if ($count <= 3)
+                                            <a class="dropdown-item d-flex align-items-center" href="/view-user/{{$notification->data['id']}}/{{$notification->id}}">
+                                                <div class="mr-3">
+                                                    <div class="icon-circle bg-warning">
+                                                        <i class="fas fa-exclamation-triangle text-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="small text-gray-500">{{ Carbon::now()->format($notification->created_at) }}</div>
+                                                    <span class="font-weight-bold">{{$notification->data['data']}}</span>
+                                                </div>
+                                            </a>
+                                            <span style="display:none;">{{$count ++ }}</span>
+                                        @endif
+                                    @endforeach
+                                    @foreach ($user->readNotifications as $notification)
+                                        @if ($count <= 3)
+                                            <a class="dropdown-item d-flex align-items-center" href="/view-user/{{$notification->data['id']}}/{{$notification->id}}">
+                                                <div class="mr-3">
+                                                    <div class="icon-circle bg-warning">
+                                                        <i class="fas fa-exclamation-triangle text-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="small text-gray-500">{{ Carbon::now()->format($notification->created_at) }}</div>
+                                                    {{$notification->data['data']}}
+                                                </div>
+                                            </a>
+                                            <span style="display:none;">{{$count ++ }}</span>
+                                            @endif
+                                    @endforeach
+                                    <a class="dropdown-item text-center small text-gray-500" href="/all-notification">Show All Alerts</a>
+                                </div>
+                            </li>
+                        @endif
 
                         <!-- Nav Item - Messages -->
                         <li class="nav-item dropdown no-arrow mx-1">
@@ -368,7 +380,49 @@
     <!-- Custom scripts for all pages-->
     <script src="http://127.0.0.1:8000/js/sb-admin-2.min.js"></script>
     <script src="http://127.0.0.1:8000/js/demo/custom.js"></script>
+    <script src="https://js.pusher.com/4.1/pusher.min.js"></script>
+    <script>
+        @if (Session::has('user'))
+            var pusher = new Pusher('{{env("MIX_PUSHER_APP_KEY")}}', {
+                cluster: '{{env("PUSHER_APP_CLUSTER")}}',
+                encrypted: true
+                });
+            
+                var channel = pusher.subscribe('notify-channel');
+                var base_url = window.location.origin;
+                
+                channel.bind('App\\Events\\Notify', function(data) {
+                //alert(data.message);
+                    if (Notification.permission === "granted"){
 
+                        const notification = new Notification("Profile View Notification..!",{
+                            body: data.message
+                        });
+
+                        notification.onclick = (e) => {
+                            window.location.href = base_url+"/view-user/"+data.id;
+                        }
+
+                    }
+                    else if(Notification.permission !== "denied"){
+
+                        Notification.requestPermission().then(permission => {
+                            if (permission === "granted"){
+
+                                const notification = new Notification("Profile View Notification..!",{
+                                    body: data.message
+                                });
+
+                                notification.onclick = (e) => {
+                                    window.location.href = base_url+"/view-user/"+data.id;
+                                }
+
+                            }
+                        });
+                    }
+                });
+            @endif
+    </script>
 </body>
 
 </html>

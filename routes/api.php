@@ -6,6 +6,7 @@ use App\Http\Controllers\dummyAPI;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FileController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -42,3 +43,5 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 
 
 Route::post("login",[UserController::class,"index"]);
+
+Route::post("upload",[FileController::class,"upload"]);

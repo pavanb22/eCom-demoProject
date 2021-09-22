@@ -8,6 +8,8 @@ use App\Models\Cart;
 use App\Models\Order;
 use Session;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\OrderPlaceNotification;
+use App\Models\User;
 
 class OrderController extends Controller
 {
@@ -27,7 +29,7 @@ class OrderController extends Controller
     {
         $user_id = Session::get('user')['id'];
         $cart_products = Cart::where('user_id',$user_id)->get();
-
+        $user = User::find($user_id);
         foreach ($cart_products as $cart) {
             $order = new Order;
             $order->product_id = $cart['product_id'];
@@ -38,7 +40,7 @@ class OrderController extends Controller
             $order->payment_status = 'pending';
             $order->save();
         }
-        
+        $user->notify((new OrderPlaceNotification())->delay(5));
         Cart::where('user_id',$user_id)->delete();
         return redirect("/");
     }

@@ -4,6 +4,8 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Models\User;
+use App\Jobs\SentTestMailJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -13,7 +15,9 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\showDB::class,
+        Commands\showTables::class,
+        Commands\generateUserData::class,
     ];
 
     /**
@@ -25,6 +29,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+       // $user = User::inRandomOrder()->first();
+        $schedule->job(new SentTestMailJob($user))->everyMinute();
+        $schedule->command("queue:work --stop-when-empty")->everyMinute();
     }
 
     /**
